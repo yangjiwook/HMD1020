@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout::main(
+
+        ~{::title},                 <!--/* title */-->
+        <!--/*--------------------------*/-->
+        <!--/*외부파일로 정의시 ex) link css */-->
+        ~{::style},                        <!--/* styles */-->
+        ~{},                        <!--/* scripts */-->
+        <!--/*내부태그로 정의시*/-->
+        ~{::style},                        <!--/* style */-->
+        ~{::script},                        <!--/* script */-->
+        <!--/*--------------------------*/-->
+        ~{::.upperHeader},          <!--/* upperHeader */-->
+        ~{::.nav},          <!--/* nav */-->
+        ~{::main},                  <!--/* main */-->
+        ~{::footer}                          <!--/* footer default*/-->
+      )}">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="울산 문화 정보 사이트 메인 화면 기본 문서">
+  <meta name="keywords" content="울산,ulsan,information,홍보,advertisement,이벤트,event">
+  <meta name="author" content="KH java 할수있조">
+  <title>공공데이터</title>
+  <style>
+    #publicInfo {
+
+      display: flex;
+      flex-direction: column;
+    }
+    footer {
+      background-color: #fff;
+    }
+  </style>
+<!--  <link rel="stylesheet" href="../../static/css/post/detailForm.css" th:href="@{/css/post/detailForm.css}">-->
+<!--  <script defer src="" th:src="@{/js/post/detailForm.js}"></script>-->
+</head>
+
+<body>
+
+<div class="wrapper">
+  <div class="upperHeader">
+    <!--  layout/upperHeader가 경로인 파일의 beforeUpperHeader 조각을 replace 한다    -->
+    <th:block th:replace="~{layout/upperHeader::upperHeaders}"></th:block>
+  </div>
+  <div class="nav">
+    <th:block th:replace="~{layout/nav::nav}"></th:block>
+  </div>
+
+
+  <!-- =============================================         -->
+  <div class="main">
+    <main id="publicInfo">
+
+      <div>
+        <!--  내정보 code      -->
+        <h3>공공데이터요청</h3>
+        <hr>
+      </div>
+
+      <div>
+        <div>
+          <button id="pubEventRequestBtn" type="button">요청</button>
+          <button id="allBtn" type="button">목록</button>
+        </div>
+        <div>
+          <table>
+            <thead>
+            <tr>
+              <th>공연명</th>
+              <th>시작일</th>
+              <th>마감일</th>
+            </tr>
+            </thead>
+            <tbody id="apiList">
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+      <script th:inline="javascript">
+    allBtn.addEventListener('click', e => {
+        location.href = `/admin/posts/pub/event/list`;
+    });
+
+    pubEventRequestBtn.addEventListener('click', e => {
+
+        const url = 'http://localhost:9080/api/pub/json';
+        document.getElementById('apiList').textContent = '가져오기중...';
+
+        fetch(url, {
+            method:'GET',
+            headers:{
+                'Accept':'application/json'
+            }
+        }).then(res => res.json())
+          .then(res => {
+            console.log(res);
+            const getListTag = pdata => {
+                  return `<tr><td>${pdata.prfnm}</td><td>${pdata.prfpdfrom}</td><td>${pdata.prfpdto}</td></tr>`;
+            };
+            const html = res.map(pdata => getListTag(pdata)).join('');
+            document.getElementById('apiList').innerHTML = html;
+          })
+          .catch(err => console.log(err));
+    });
+  </script>
+
+    </main>
+    <!--  main을 세분화하려면 상단 리스트에 추가하고 작성    -->
+  </div>
+  <!--end main -->
+
+
+</div>
+<footer>
+
+</footer>
+
+</body>
+</html>
